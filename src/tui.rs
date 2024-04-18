@@ -21,7 +21,10 @@ pub mod tui {
         process::exit,
     };
 
-    use crate::typer::{self, typer::{get_file_input, Text}};
+    use crate::typer::{
+        self,
+        typer::{get_file_input, Text},
+    };
     use ratatui::prelude::*;
     use std::thread::spawn;
 
@@ -30,18 +33,15 @@ pub mod tui {
         file_path: String,
     }
 
-    pub fn gui(
-        text: String,
-        should_type: bool,
-    ) -> Result<()> {
-        
+    pub fn gui(text: String, should_type: bool) -> Result<()> {
         stdout().execute(EnterAlternateScreen)?;
         enable_raw_mode()?;
         let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
         terminal.clear()?;
 
         if should_type == true {
-            let th = spawn(|| typer::typer::start_typing());
+            let mut pos: Box<i32> = Box::new(0);
+            let th = spawn(move || typer::typer::start_typing(&mut pos));
             let _th_gui = spawn(|| gui("enabled".to_string(), false));
 
             th.join().unwrap();
@@ -51,13 +51,11 @@ pub mod tui {
             todo!("finsh the text display after finishing the write")
         }
 
-        
+        let pos = 0;
         loop {
-
-            let mut  tw  = get_text();
+            let mut tw = get_text();
 
             let ttw = get_colored_paragarph(&mut tw);
-            
 
             let title = Title::from(" Mount Blue Fucker ".bold());
             let instructions = Title::from(Line::from(vec![
@@ -79,13 +77,7 @@ pub mod tui {
 
             terminal.draw(|frame| {
                 let mut area = Rect::new(0, 0, frame.size().width, 10);
-                frame.render_widget(
-                    Paragraph::new(ttw)
-                        .centered()
-                        .blue()
-                        .block(block),
-                    area,
-                );
+                frame.render_widget(Paragraph::new(ttw).centered().blue().block(block), area);
                 area = Rect::new(0, 10, (frame.size().width / 2) - 10, 10);
                 frame.render_widget(
                     Paragraph::new(text.clone())

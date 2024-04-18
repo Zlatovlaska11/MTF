@@ -22,7 +22,7 @@ pub mod typer {
     pub struct Text {
         pub text: Vec<Chars>,
     }
-    
+
     #[derive(impl_new::New)]
     pub struct Chars {
         pub key: char,
@@ -95,14 +95,18 @@ pub mod typer {
         let mut rng = rand::thread_rng();
         sleep(time::Duration::from_millis(1000));
 
+        let mut counter = 0;
+
         for key in text.text {
             sleep(time::Duration::from_millis(rng.gen_range(100..=1000)));
-            simulate_keypress(key.key)
+            simulate_keypress(key.key);
+            counter+=1;
         }
     }
 
-    pub fn start_typing() {
+    pub fn start_typing(pos: &mut i32) {
         let text = get_file_input(&"test.txt".to_string());
+
 
         typer(text);
     }
