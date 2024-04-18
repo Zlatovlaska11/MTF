@@ -14,18 +14,23 @@ pub mod tui {
             Block, Borders, Paragraph,
         },
     };
+    use serde::{Deserialize, Serialize};
     use std::{
-        io::{stdout, Result, Stdout},
-        process::exit,
+        fs, io::{stdout, Result, Stdout}, process::exit
     };
 
-    use crate::typer::{self};
+    use crate::typer::{self, typer::Text};
     use ratatui::prelude::*;
     use std::thread::spawn;
 
-    pub type Tui = Terminal<CrosstermBackend<Stdout>>;
+    #[derive(Deserialize, Serialize)]
+    pub struct Config{
+        file_path: String
 
-    pub fn gui(text: String, should_type: bool) -> Result<()> {
+    }
+
+
+    pub fn gui(text: String, should_type: bool, text_to_write: crate::typer::typer::Text) -> Result<()> {
         stdout().execute(EnterAlternateScreen)?;
         enable_raw_mode()?;
         let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
@@ -33,12 +38,14 @@ pub mod tui {
 
         if should_type == true {
             let th = spawn(|| typer::typer::start_typing());
-            let th_gui = spawn(|| gui("enabled".to_string(), false));
+            let _th_gui = spawn(|| gui("enabled".to_string(), false, text_to_write));
 
             th.join().unwrap();
             
 
-            gui("disabled".to_string(), false).unwrap();
+            gui("disabled".to_string(), false, text_to_write).unwrap();
+
+            todo!("finsh the text display after finishing the write")
         }
 
         loop {
@@ -89,9 +96,9 @@ pub mod tui {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e') {
                     if should_type == true {
-                        let _ = gui("enabled".to_string(), false);
+                        let _ = gui("enabled".to_string(), false, text_to_write);
                     } else {
-                        let _ = gui("disabled".to_string(), true);
+                        let _ = gui("disabled".to_string(), true, text_to_write);
                     }
                 }
             }
@@ -100,5 +107,15 @@ pub mod tui {
         stdout().execute(LeaveAlternateScreen)?;
         disable_raw_mode()?;
         exit(69);
+    }
+
+
+    fn get_text() -> Text{
+        
+        let file_text = fs::read_to_string("config.json").unwrap();
+        let conf: Config = serde_json::from_str(file_text.as_str()).expect("error reading the config file");
+
+
+       typer::typer::get_file_input(&conf.file_path)
     }
 }
