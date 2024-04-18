@@ -21,7 +21,7 @@ pub mod tui {
         process::exit,
     };
 
-    use crate::typer::{self, typer::Text};
+    use crate::typer::{self, typer::{get_file_input, Text}};
     use ratatui::prelude::*;
     use std::thread::spawn;
 
@@ -34,6 +34,7 @@ pub mod tui {
         text: String,
         should_type: bool,
     ) -> Result<()> {
+        
         stdout().execute(EnterAlternateScreen)?;
         enable_raw_mode()?;
         let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
@@ -50,7 +51,14 @@ pub mod tui {
             todo!("finsh the text display after finishing the write")
         }
 
+        
         loop {
+
+            let mut  tw  = get_text();
+
+            let ttw = get_colored_paragarph(&mut tw);
+            
+
             let title = Title::from(" Mount Blue Fucker ".bold());
             let instructions = Title::from(Line::from(vec![
                 " Start Typing ".into(),
@@ -72,7 +80,7 @@ pub mod tui {
             terminal.draw(|frame| {
                 let mut area = Rect::new(0, 0, frame.size().width, 10);
                 frame.render_widget(
-                    Paragraph::new("Hello Ratatui! (press 'q' to quit)")
+                    Paragraph::new(ttw)
                         .centered()
                         .blue()
                         .block(block),
