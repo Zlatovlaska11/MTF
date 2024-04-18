@@ -52,7 +52,6 @@ pub mod typer {
 
         for key in text {
             sleep(time::Duration::from_millis(rng.gen_range(100..=1000)));
-            print!("{}", key);
             simulate_keypress(key)
         }
     }

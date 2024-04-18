@@ -5,7 +5,7 @@ pub mod tui {
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
     };
-    use enigo::Key;
+
     use ratatui::{
         prelude::{CrosstermBackend, Stylize, Terminal},
         symbols::border,
@@ -16,16 +16,10 @@ pub mod tui {
     };
     use std::{
         io::{stdout, Result, Stdout},
-        os::unix::thread,
         process::exit,
     };
 
-    struct App {
-        text: String,
-        pos: i32,
-    }
     use crate::typer::{self};
-    //use crate::typer::typer;
     use ratatui::prelude::*;
     use std::thread::spawn;
 
@@ -40,9 +34,11 @@ pub mod tui {
         if should_type == true {
             let th = spawn(|| typer::typer::start_typing());
             let th_gui = spawn(|| gui("enabled".to_string(), false));
-            
+
             th.join().unwrap();
-            th_gui.join().unwrap();
+            let _ = th_gui.join().unwrap();
+
+            gui("disabled".to_string(), false).unwrap();
         }
 
         loop {
