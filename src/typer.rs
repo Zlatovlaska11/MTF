@@ -54,6 +54,7 @@ pub mod typer {
             sleep(time::Duration::from_millis(rng.gen_range(100..=1000)));
             simulate_keypress(key)
         }
+
     }
 
 

@@ -36,7 +36,7 @@ pub mod tui {
             let th_gui = spawn(|| gui("enabled".to_string(), false));
 
             th.join().unwrap();
-            let _ = th_gui.join().unwrap();
+            
 
             gui("disabled".to_string(), false).unwrap();
         }
@@ -44,7 +44,7 @@ pub mod tui {
         loop {
             let title = Title::from(" Mount Blue Fucker ".bold());
             let instructions = Title::from(Line::from(vec![
-                " StartTyping ".into(),
+                " Start Typing ".into(),
                 "<e>".blue().bold(),
                 " Quit ".into(),
                 "<Q> ".blue().bold(),
