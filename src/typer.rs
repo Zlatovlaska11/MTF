@@ -20,13 +20,13 @@ pub mod typer {
 
     #[derive(impl_new::New)]
     pub struct Text {
-        text: Vec<Chars>,
+        pub text: Vec<Chars>,
     }
     
     #[derive(impl_new::New)]
-    struct Chars {
-        key: char,
-        col: Col,
+    pub struct Chars {
+        pub key: char,
+        pub col: Col,
     }
 
     impl Convert for Chars {
