@@ -91,23 +91,28 @@ pub mod typer {
         }
     }
 
-    fn typer(text: Text) {
+    fn typer(text: Text, state: TypingState) {
         let mut rng = rand::thread_rng();
         sleep(time::Duration::from_millis(1000));
 
-        let mut counter = 0;
+        let mut counter = state.cur_pos;
 
         for key in text.text {
             sleep(time::Duration::from_millis(rng.gen_range(100..=1000)));
             simulate_keypress(key.key);
-            counter+=1;
+            counter += 1;
         }
+    }
+
+    struct TypingState {
+        cur_pos: i32,
     }
 
     pub fn start_typing(pos: &mut i32) {
         let text = get_file_input(&"test.txt".to_string());
 
+        let counter: TypingState = TypingState { cur_pos: *pos};
 
-        typer(text);
+        typer(text, counter);
     }
 }

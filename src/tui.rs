@@ -21,10 +21,7 @@ pub mod tui {
         process::exit,
     };
 
-    use crate::typer::{
-        self,
-        typer::{get_file_input, Text},
-    };
+    use crate::typer::{self, typer::Text};
     use ratatui::prelude::*;
     use std::thread::spawn;
 
@@ -33,6 +30,8 @@ pub mod tui {
         file_path: String,
     }
 
+    static mut position: i32 = 0;
+
     pub fn gui(text: String, should_type: bool) -> Result<()> {
         stdout().execute(EnterAlternateScreen)?;
         enable_raw_mode()?;
@@ -40,14 +39,16 @@ pub mod tui {
         terminal.clear()?;
 
         if should_type == true {
-            let mut pos: Box<i32> = Box::new(0);
-            let th = spawn(move || typer::typer::start_typing(&mut pos));
-            let _th_gui = spawn(|| gui("enabled".to_string(), false));
+            unsafe{
 
-            th.join().unwrap();
+                let th = spawn(move || typer::typer::start_typing(&mut position));
+                let _th_gui = spawn(|| gui("enabled".to_string(), false));
 
-            gui("disabled".to_string(), false).unwrap();
+                th.join().unwrap();
 
+                gui("disabled".to_string(), false).unwrap();
+
+            }
             todo!("finsh the text display after finishing the write")
         }
 
@@ -124,7 +125,8 @@ pub mod tui {
 
         let untyped = Style::default().fg(Color::Green);
         let _typed = Style::default().fg(Color::LightGreen);
-
+        
+        //add range implementation (0..pos ) == typed rest not typed
         for ch in &txt.text {
             match ch.col {
                 typer::typer::Col::Typed => {
